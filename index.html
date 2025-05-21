@@ -8,64 +8,55 @@
     <title>UUI POC</title>
 
     <template id="app-layout">
-      <single-spa-router containerel="#outlet">
-        <route path="blazor">
-          <application name="blazor"></application>
-        </route>
-        <route path="mudblazor">
-          <application name="mudblazor"></application>
-        </route>
-        <route default>
-          <div id="home-view">
-            <h1 id="home-title">POC</h1>
-            <span id="home-byline">The prof of concept for UI integration</span>
-          </div>
-        </route>
-      </single-spa-router>
     </template>
 
-    <script type="importmap">
-    {
-      "imports": {
-        "single-spa": "https://ga.jspm.io/npm:single-spa@6.0.0/lib/es2015/esm/single-spa.min.js",
-        "single-spa-layout": "https://ga.jspm.io/npm:single-spa-layout@2.2.0/dist/esm/single-spa-layout.min.js",
-        "@lit/reactive-element": "https://ga.jspm.io/npm:@lit/reactive-element@2.0.4/reactive-element.js",
-        "@lit/reactive-element/": "https://ga.jspm.io/npm:@lit/reactive-element@2.0.4/",
-        "lit": "https://ga.jspm.io/npm:lit@3.1.2/index.js",
-        "lit/": "https://ga.jspm.io/npm:lit@3.1.2/",
-        "lit-element": "https://ga.jspm.io/npm:lit-element@4.0.4/index.js",
-        "lit-element/": "https://ga.jspm.io/npm:lit-element@4.0.4/",
-        "lit-html": "https://ga.jspm.io/npm:lit-html@3.1.2/lit-html.js",
-        "lit-html/": "https://ga.jspm.io/npm:lit-html@3.1.2/",
-        "blazor-wasm-single-spa": "https://ga.jspm.io/npm:blazor-wasm-single-spa@0.5.0/dist/index.js",
-        "blazor-wasm-ext-mud-blazor": "https://ga.jspm.io/npm:blazor-wasm-ext-mud-blazor@0.2.0/dist/index.js",
-        "@poc-uui/blazor": "http://poc-uui-module-blazor.s3-website-ap-southeast-2.amazonaws.com/lifecycles.js",
-        "@poc-uui/mudblazor": "http://poc-uui-module-mudblazor.s3-website-ap-southeast-2.amazonaws.com/lifecycles.js"
-      }
-    }
+    <script>
+
+      // Dynamically load the importmap from http://localhost:5133
+      fetch('http://localhost:5133/importmap')
+        .then(response => response.json())
+        .then(importmap => {
+          const script = document.createElement('script');
+          script.type = 'importmap';
+          script.textContent = JSON.stringify(importmap);
+          document.head.appendChild(script);
+        })
+        .catch(error => {
+          console.error('Failed to load importmap:', error);
+        });
+
+      // Dynamically load navigation items
+      fetch('http://localhost:5133/navigationItems')
+        .then(response => response.json())
+        .then(navItems => {
+          const nav = document.getElementById('shell-nav-sidebar');
+          if (!nav) {
+            console.error('Navigation sidebar not found!');
+            return;
+          }
+
+          nav.innerHTML = ''; // Clear existing static nav items
+
+          navItems.forEach(item => {
+            const link = document.createElement('a');
+            link.href = item.url;
+            link.textContent = item.title;
+            link.className = 'poc-nav-item';
+            nav.appendChild(link);
+          });
+        })
+        .catch(error => {
+          console.error('Failed to load navigation items:', error);
+        });
     </script>
 
     <script type="module" src="/src/main.ts"></script>
   </head>
 
   <body>
-    <!-- <button id="toggle-sidebar">Toggle Sidebar</button> -->
     <nav id="shell-nav-sidebar">
-      <a href="/" class="poc-nav-item">Home</a>
-      <a href="/blazor" class="poc-nav-item">Blazor Module</a>
-      <a href="/mudblazor" class="poc-nav-item">MudBlazor Module</a>
+      <!-- Navigation items will be dynamically loaded here -->
     </nav>
     <div id="outlet"></div>
-
-    
-    <!-- <script>
-      const toggleButton = document.getElementById('toggle-shell-nav-sidebar');
-      const sidebar = document.getElementById('shell-nav-sidebar');
-
-      toggleButton.addEventListener('click', () => {
-        sidebar.classList.toggle('hidden');
-      });
-    </script> -->
   </body>
-
 </html>

@@ -5,6 +5,7 @@ import {
   constructLayoutEngine,
 } from 'single-spa-layout';
 
+
 import './style.css';
 
 connectNavItems();
@@ -19,8 +20,13 @@ function connectNavItems() {
 }
 
 function loadMicroFrontends() {
-  const appLayout = document.querySelector('#app-layout')!;
-  const routes = constructRoutes(appLayout);
+  // const appLayout = document.querySelector('#app-layout')!;
+  fetch('http://localhost:5133/routes')
+                    .then((response) => response.json())
+                    // .then((json) => JSON.stringify(json))
+                    .then((json) => {
+                      console.log(json);
+  const routes = constructRoutes(json);
   const applications = constructApplications({
     routes,
     loadApp({ name }) {
@@ -65,6 +71,7 @@ function loadMicroFrontends() {
         };
       },
     });
+  });
   });
 
   start();
