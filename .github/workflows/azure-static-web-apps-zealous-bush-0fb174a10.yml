@@ -23,7 +23,9 @@ jobs:
           submodules: true
           lfs: false
       - name: Build
-        run: npm run build
+        run: |
+          npm install  
+          npm run build
       - name: Install OIDC Client from Core Package
         run: npm install @actions/core@1.6.0 @actions/http-client
       - name: Get Id Token
